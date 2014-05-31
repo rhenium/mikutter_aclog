@@ -1,0 +1,11 @@
+---
+slug: mikutter_aclog
+depends:
+  mikutter: "3.0.0.alpha4"
+  plugin:
+  - gtk
+version: "1.0"
+author: "rhenium"
+name: "aclog"
+description: "aclog 連携"
+
