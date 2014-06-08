@@ -27,8 +27,22 @@ Plugin.create(:mikutter_aclog) do
       ids = arr.map { |tweet| tweet[:id] }
       (Service.primary/:statuses/:lookup).messages(id: ids.join(",")) } end
 
+  def aclog_user_stats(user)
+    aclog_request("/api/users/stats.json?id=#{user[:id]}") end
+
   def userdb
     @userdb ||= {} end
+
+  class User
+    def count_favorite_by
+      Thread.new {
+        m = open("http://favstar.fm/users/#{idname}").read.match(/<div[\s]+class='fs-value'[\s]*>[\s]*([0-9,]+)[\s]*<\/div>[\s]*<div[\s]+class='fs-title'[\s]*>[\s]*Favs[\s]*Received[\s]*<\/div>/) rescue nil
+        m[1].gsub(",", "").to_i rescue "-"
+      }.next { |favstar|
+        Plugin.create(:mikutter_aclog).aclog_user_stats(self).next { |aclog_ret|
+          aclog = aclog_ret[:reactions_count] rescue "-"
+          @value[:favouritesby_count] = "#{favstar}/#{aclog}" } } end
+  end
 
   command(:mikutter_aclog_get_voters,
           name: "ふぁぼったユーザーを aclog から取得",
