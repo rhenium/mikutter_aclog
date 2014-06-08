@@ -54,7 +54,7 @@ Plugin.create(:mikutter_aclog) do
                       if userdb.key?(id)
                         sp.votes.delete(userdb[id])
                         sp.votes << userdb[id] end } end end
-                mp.on_modify } end } end
+                mp.reset_height } end } end
       }.terminate("failed to retrieve voters") end end
 
   profiletab(:aclog_best, "aclog best") do
