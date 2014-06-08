@@ -22,6 +22,11 @@ Plugin.create(:mikutter_aclog) do
   def aclog_tweet(id)
     aclog_request("/api/tweets/show.json?id=#{id}") end
 
+  def aclog_user_best(user)
+    aclog_request("/api/tweets/user_best.json?user_id=#{user[:id]}&count=100").next {|arr|
+      ids = arr.map { |tweet| tweet[:id] }
+      (Service.primary/:statuses/:lookup).messages(id: ids.join(",")) } end
+
   command(:mikutter_aclog_get_voters,
           name: "ふぁぼったユーザーを aclog から取得",
           condition: Plugin::Command[:CanReplyAll],
@@ -57,4 +62,15 @@ Plugin.create(:mikutter_aclog) do
           warn $!
           warn $@
         end } end end
+
+  profiletab(:aclog_best, "aclog best") do
+    set_icon File.join(File.dirname(__FILE__), "aclog.png")
+    i_timeline = timeline nil do
+      order do |message|
+        message[:retweet_count].to_i + message[:favorite_count].to_i end end
+    aclog_user_best(user).next { |tl|
+      p tl.first
+      #i_timeline << tl.take(6)
+    }.terminate("@%{user} の aclog ベストツイートが取得ふぇきませんでした(◞‸◟)" % { user: user[:idname] })
+  end
 end
