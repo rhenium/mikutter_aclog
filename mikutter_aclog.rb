@@ -41,6 +41,7 @@ Plugin.create(:mikutter_aclog) do
       }.next { |favstar|
         Plugin.create(:mikutter_aclog).aclog_user_stats(self).next { |aclog_ret|
           aclog = aclog_ret[:reactions_count] rescue "-"
+          aclog = "(#{aclog})" unless aclog_ret[:registered]
           @value[:favouritesby_count] = "#{favstar}/#{aclog}" } } end
   end
 
