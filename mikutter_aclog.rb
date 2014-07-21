@@ -4,12 +4,17 @@ require "json"
 Plugin.create(:mikutter_aclog) do
   ACLOG_BASE = "http://aclog.koba789.com"
 
-  MIKU_TWITTER ||= MikuTwitter.new()
-
   def aclog_request(path)
+    provider = "https://api.twitter.com/1.1/account/verify_credentials.json"
+
+    token = Service.primary.access_token
+    consumer = OAuth::Consumer.new(token.consumer.key, token.consumer.secret, site: "https://api.twitter.com")
+    _req = consumer.create_signed_request(:get, URI.parse(provider).path, token)
+    auth_header = _req["Authorization"]
+
     thread = Thread.new do
-      res = MIKU_TWITTER.access_token.get(ACLOG_BASE + path)
-      res.body end
+      res = open(ACLOG_BASE + path, "X-Auth-Service-Provider" => provider, "X-Verify-Credentials-Authorization" => auth_header)
+      res.read end
     thread.abort_on_exception = false
     thread.next { |str| JSON.parse(str).symbolize } end
 
