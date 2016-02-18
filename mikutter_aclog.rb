@@ -2,7 +2,7 @@ require "open-uri"
 require "json"
 
 Plugin.create(:mikutter_aclog) do
-  ACLOG_BASE = "http://aclog.koba789.com"
+  ACLOG_BASE = "https://aclog.rhe.jp"
 
   def aclog_request(path)
     provider = "https://api.twitter.com/1.1/account/verify_credentials.json"
